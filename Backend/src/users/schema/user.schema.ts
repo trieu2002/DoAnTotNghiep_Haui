@@ -3,9 +3,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
-/**
- * Link documenet create schema:https://docs.nestjs.com/techniques/mongodb
- */
 @Schema({
     timestamps:true,
     versionKey:false
