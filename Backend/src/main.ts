@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
-import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
 
 async function bootstrap() {
