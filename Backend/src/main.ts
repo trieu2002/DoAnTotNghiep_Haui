@@ -15,6 +15,8 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('ejs');
+  // config cors
+  app.enableCors();
   const configService=app.get(ConfigService);
   const PORT=configService.get<number>('PORT');
   await app.listen(PORT);
