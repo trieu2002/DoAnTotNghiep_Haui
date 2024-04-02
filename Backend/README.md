@@ -30,3 +30,4 @@ $ npm run test:cov
 $ nest -g reource name --no-spec (Nếu k muốn tạo file test)
 $ nest -g resource name(tên muôn đặt) (có cả file test)
 # Mô hình Stateful và Stateless
+$ Config Cors 

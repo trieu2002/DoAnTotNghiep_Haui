@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './schema/user.schema';
-import { Model } from 'mongoose';
+import { User, UserDocument } from './schema/user.schema';
 import {genSaltSync,hashSync,compareSync} from 'bcryptjs';
 import { SALT } from 'src/const/const';
+import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel:Model<User>){}
+  constructor(@InjectModel(User.name) private userModel:SoftDeleteModel<UserDocument>){}
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
   }
