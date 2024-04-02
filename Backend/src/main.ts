@@ -5,12 +5,17 @@ import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
+import { VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
   );
-
+  app.setGlobalPrefix("api");
+  app.enableVersioning({
+    type:VersioningType.URI,
+    defaultVersion:['1','2']
+  })
 
   app.useGlobalGuards(new JwtAuthGuard(app.get(Reflector)));
   app.useGlobalInterceptors(new TransformInterceptor(app.get(Reflector)));
