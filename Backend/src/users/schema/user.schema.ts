@@ -24,7 +24,7 @@ export class User {
   role:string;
   @Prop({type:Object})
   company:{
-      _id:mongoose.Types.ObjectId,
+      _id:mongoose.Schema.Types.ObjectId,
       email:string
   }
   @Prop()

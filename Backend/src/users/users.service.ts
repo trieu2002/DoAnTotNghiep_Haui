@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotAcceptableException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateRegisterDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -16,9 +16,6 @@ export class UsersService {
   async create(createUserDto: CreateUserDto,user:IUser) {
     const {name,email,password,age,gender,address,role,company}=createUserDto;
     const isExistEmail=await this.findByEmail(email);
-    if(isExistEmail){
-       throw new BadRequestException('Email đã tồn tại.Vui lòng đăng kí tài khoản khác!')
-    }
     const hashPassword=this.hashPassword(password);
     let newUser=await this.userModel.create({
       name,email,password:hashPassword,
@@ -62,9 +59,7 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    if(!mongoose.Types.ObjectId.isValid(id)){
-      throw new NotAcceptableException('Not Found')
-   };
+  
     return await this.userModel.findOne({_id:id}).select('-password');
    
   }
@@ -84,9 +79,9 @@ export class UsersService {
   }
 
   async remove(id: string,user:IUser) {
-     if(!mongoose.Types.ObjectId.isValid(id)){
-        throw new NotAcceptableException('Not Found')
-     };
+    //  if(!mongoose.Types.ObjectId.isValid(id)){
+    //     throw new NotAcceptableException('Not Found')
+    //  };
      await this.userModel.updateOne({_id:id},{deletedBy:{_id:user?._id,email:user?.email}})
      return await this.userModel.softDelete({_id:id})
   }
@@ -99,24 +94,19 @@ export class UsersService {
       return compareSync(password,hash);
   }
   async findByEmail(email:string){
-     return await this.userModel.findOne({email});
+     return await this.userModel.findOne({email}).lean();
   }
   async register(user:CreateRegisterDto){
-    const {name,email,password,age,gender,address}=user;
-    const isExistEmail=await this.findByEmail(email);
-    if(isExistEmail){
-       throw new BadRequestException('Email đã tồn tại.Vui lòng đăng kí tài khoản khác!')
-    }
-    const hashPassword=this.hashPassword(password);
-    let newRegister=await this.userModel.create({
-      name,
-      email,
-      password:hashPassword,
-      age,
-      gender,
-      address,
-      role:'USER'
-    });
-    return newRegister;
+     const {name,email,password,age,gender,address}=user;
+     const isEmailExist=await this.findByEmail(email);
+     if(isEmailExist){
+        throw new ConflictException('Email đã tồn tại. Vui lòng đăng kí tài khoản khác!')
+     }
+     let passwordNew=this.hashPassword(password);
+     let newUserRegister=await this.userModel.create({
+        name,email,password:passwordNew,age,gender,address
+     });
+     return newUserRegister;
   }
+
 }

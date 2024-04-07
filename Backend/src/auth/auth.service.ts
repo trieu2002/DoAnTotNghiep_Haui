@@ -36,10 +36,11 @@ export class AuthService {
       };
     }
     async register(user:CreateRegisterDto){
-        let newUser=await this.userService.register(user);
-        return {
-            _id:newUser?._id,
-            createdAt:newUser?.createdAt
-        }
+       let newUser=await this.userService.register(user);
+       console.log('<<<<<<< newUser >>>>>>>',newUser?.createdAt);
+       return {
+         _id:newUser?._id,
+         createdAt:newUser?.createdAt
+       }
     }
 }

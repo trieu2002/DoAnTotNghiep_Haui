@@ -7,6 +7,7 @@ import { CreateRegisterDto } from 'src/users/dto/create-user.dto';
 @Controller(AUTH_ROUTE)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+  @Public()
   @UseGuards(LocalAuthGuard)
   @ResponseMessage('Login user')
   @Post("/login")
@@ -17,7 +18,7 @@ export class AuthController {
   @ResponseMessage('Register a new user')
   @Post("/register")
   handlerRegister(@Body() registerUserDto:CreateRegisterDto){
-    this.authService.register(registerUserDto);
+    return this.authService.register(registerUserDto);
   }
   
 }
