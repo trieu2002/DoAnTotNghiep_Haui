@@ -8,6 +8,7 @@ import { CreateRegisterDto } from 'src/users/dto/create-user.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @UseGuards(LocalAuthGuard)
+  @ResponseMessage('Login user')
   @Post("/login")
   handlerLogin(@Request() req){
     return this.authService.login(req.user);

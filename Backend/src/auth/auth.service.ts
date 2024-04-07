@@ -27,10 +27,12 @@ export class AuthService {
       }
       return {
         access_token: this.jwtService.sign(payload),
-        _id,
-        name,
-        email,
-        role
+        user:{
+          _id,
+          name,
+          email,
+          role
+        }
       };
     }
     async register(user:CreateRegisterDto){
