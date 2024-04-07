@@ -3,7 +3,7 @@ import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { COMPANIES_ROUTE } from 'src/const/const';
-import { DUser } from 'src/core/core';
+import { DUser, ResponseMessage } from 'src/core/core';
 import { IUser } from 'src/users/interface/user.interface';
 
 @Controller(COMPANIES_ROUTE)
@@ -16,8 +16,9 @@ export class CompaniesController {
   }
 
   @Get()
-  findAll(@Query('page') currentPage:string,@Query('pageSize') pageSize:string,@Query() qs:string,@DUser() user:IUser) {
-    return this.companiesService.findAll(+currentPage,+pageSize,qs,user);
+  @ResponseMessage('Fetch companies by paginate')
+  findAll(@Query('current') page:string,@Query('pageSize') pageSize:string,@Query() qs:string,@DUser() user:IUser) {
+    return this.companiesService.findAll(+page,+pageSize,qs,user);
   }
 
   @Get(':id')

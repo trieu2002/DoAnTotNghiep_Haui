@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRegisterDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -29,41 +29,44 @@ export class UsersService {
   }
 
   async findAll(currentPage:number,pageSize:number,qs:string) {
-    const { filter, sort, projection, population } = aqp(qs);
-    delete filter.page;
-    delete filter.limit;
-    let offset=(+currentPage-1)*(+pageSize);
-    let defaultLimit=(+pageSize) ? +pageSize : 10;
+    let { filter, sort, projection, population } = aqp(qs);
+    delete filter.current;
+    delete filter.pageSize;
+    let defaultPageSize=+pageSize ? +pageSize : 10;
+    let defaultPage=+currentPage ? +currentPage : 1;
+    let offSetPage=(+defaultPage-1)*(+defaultPageSize);
     const totalItems=(await this.userModel.find(filter)).length;
-    const totalPages=Math.ceil(totalItems/defaultLimit);
-    if (isEmpty(sort)) {
-      // @ts-ignore: Unreachable code error
-      sort = "-updatedAt"
+    const totalPages=Math.ceil(totalItems/defaultPageSize);
+    //@ts-ignore
+    if(isEmpty(sort)){
+      //@ts-ignore:
+       sort='-updatedAt';
     }
-    const result = await this.userModel.find(filter)
-       .skip(offset)
-       .limit(defaultLimit)
-       // @ts-ignore: Unreachable code error
-       .sort(sort)
-       .populate(population)
-       .exec();
+    const result=await this.userModel.find(filter)
+    .skip(offSetPage)
+    .limit(defaultPageSize)
+    //@ts-ignore
+    .sort(sort)
+    .select('-password')
+    .populate(population)
+    .exec();
     return {
-        meta: {
-        current: currentPage, //trang hiện tại
-        pageSize: pageSize, //số lượng bản ghi đã lấy
-        pages: totalPages, //tổng số trang với điều kiện query
-        total: totalItems // tổng số phần tử (số bản ghi)
-        },
-        result //kết quả query
-      }
+       meta:{
+          page:defaultPage as number,
+          pageSize:defaultPageSize as number,
+          pages:totalPages as number,
+          total:totalItems as number
+       },
+       result
+    }
   }
-
   async findOne(id: string) {
-  
+    if(!mongoose.Types.ObjectId.isValid(id)){
+      throw new NotFoundException('Not Found')
+   };
     return await this.userModel.findOne({_id:id}).select('-password');
    
   }
-
   async update(updateUserDto: UpdateUserDto,user:IUser) {
       const updated=await this.userModel.updateOne({
         _id:updateUserDto._id
@@ -79,9 +82,9 @@ export class UsersService {
   }
 
   async remove(id: string,user:IUser) {
-    //  if(!mongoose.Types.ObjectId.isValid(id)){
-    //     throw new NotAcceptableException('Not Found')
-    //  };
+     if(!mongoose.Types.ObjectId.isValid(id)){
+        throw new NotFoundException('Not Found')
+     };
      await this.userModel.updateOne({_id:id},{deletedBy:{_id:user?._id,email:user?.email}})
      return await this.userModel.softDelete({_id:id})
   }
