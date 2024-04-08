@@ -54,8 +54,6 @@ export class Job {
        _id:mongoose.Schema.Types.ObjectId,
        email:string
   }
-
-
 }
 
 export const JobSchema = SchemaFactory.createForClass(Job);
