@@ -56,6 +56,7 @@ export class ResumesService {
     //@ts-ignore
     .sort(sort)
     .populate(population)
+    .select(projection as any)
     .exec();
     return {
        meta:{
