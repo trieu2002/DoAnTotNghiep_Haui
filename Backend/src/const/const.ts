@@ -6,4 +6,5 @@ export const JOBS_ROUTE:string='jobs';
 export const ROLES_ROUTE:string='roles';
 export const PERMISSIONS_ROUTE:string='permissions';
 export const SUBSCRIBERS_ROUTE:string='subscribers';
+export const FILES_ROUTE:string='files';
 export const SALT:number=10;
