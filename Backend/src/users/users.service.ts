@@ -111,5 +111,11 @@ export class UsersService {
      });
      return newUserRegister;
   }
+  async updateRefreshToken(refreshToken:string,_id:string){
+      return await this.userModel.updateOne({_id},{refreshToken});
+  }
+  async findUserByToken(refreshToken:string){
+    return await this.userModel.findOne({refreshToken});
+  }
 
 }
