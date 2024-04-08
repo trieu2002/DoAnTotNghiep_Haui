@@ -42,7 +42,6 @@ export class JobsService {
     .limit(defaultPageSize)
     //@ts-ignore
     .sort(sort)
-    .select('-password')
     .populate(population)
     .exec();
     return {
