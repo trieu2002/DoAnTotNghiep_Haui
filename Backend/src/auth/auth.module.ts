@@ -13,9 +13,9 @@ import ms from 'ms';
   imports:[UsersModule,PassportModule,JwtModule.registerAsync({
     imports: [ConfigModule],
     useFactory: async (configService: ConfigService) => ({
-      secretOrPrivateKey: configService.get<string>("JWT_SECRET_KEY"),
+      secret: configService.get<string>("JWT_SECRET_KEY"),
       signOptions: {
-          expiresIn: ms(configService.get<string>("JWT_SECRET_KEY_EXPIRESIN")),
+          expiresIn: ms(configService.get<string>("JWT_SECRET_KEY_EXPIRESIN"))/1000,
       },
     }),
     inject: [ConfigService],

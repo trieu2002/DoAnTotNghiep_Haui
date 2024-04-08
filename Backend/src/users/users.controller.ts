@@ -17,8 +17,8 @@ export class UsersController {
 
   @Get()
   @ResponseMessage('Fetch user by paginate')
-  findAll(@Query('page') currentPage:string,@Query('pageSize') pageSize:string,@Query() qs:string) {
-    return this.usersService.findAll(+currentPage,+pageSize,qs);
+  findAll(@Query('current') page:string,@Query('pageSize') pageSize:string,@Query() qs:string) {
+    return this.usersService.findAll(+page,+pageSize,qs);
   }
   @Public()
   @ResponseMessage('Fetch user by id')
@@ -27,7 +27,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
   @ResponseMessage('Update user')
-  @Patch(':id')
+  @Patch()
   update(@Body() updateUserDto: UpdateUserDto,@DUser() user:IUser) {
     return this.usersService.update(updateUserDto,user);
   }
