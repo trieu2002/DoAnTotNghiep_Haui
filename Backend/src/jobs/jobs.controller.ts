@@ -17,6 +17,7 @@ export class JobsController {
   }
   @ResponseMessage('Fetch job by paginate')
   @Get()
+  @Public()
   findAll(@Query('current') page:string,@Query('pageSize') pageSize:string,@Query() qs:string) {
     return this.jobsService.findAll(+page,+pageSize,qs);
   }

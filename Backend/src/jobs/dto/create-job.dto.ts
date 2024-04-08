@@ -6,6 +6,8 @@ class Company{
    _id:mongoose.Schema.Types.ObjectId;
     @IsNotEmpty({message:"Name company không được để trống"})
     name:string;
+    @IsNotEmpty({message:"Logo company không được để trống"})
+    logo:string;
 }
 export class CreateJobDto {
     @IsNotEmpty({message:"Tên jobs khồng được để trống"})
