@@ -10,9 +10,13 @@ import { IUser } from './interface/user.interface';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
 import { isEmpty } from 'class-validator';
+import { Role, RoleDocument } from 'src/roles/schema/role.schema';
+import { USER_ROLE } from 'src/databases/simple';
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel:SoftDeleteModel<UserDocument>){}
+  constructor(
+    @InjectModel(User.name) private userModel:SoftDeleteModel<UserDocument>,
+    @InjectModel(Role.name) private  roleModel:SoftDeleteModel<RoleDocument>){}
   async create(createUserDto: CreateUserDto,user:IUser) {
     const {name,email,password,age,gender,address,role,company}=createUserDto;
     const isExistEmail=await this.findByEmail(email);
@@ -109,17 +113,20 @@ export class UsersService {
       return compareSync(password,hash);
   }
   async findByEmail(email:string){
-     return await this.userModel.findOne({email}).populate({path:'role',select:{name:1,permissions:1}})
+     return await this.userModel.findOne({email}).populate({path:'role',select:{name:1}})
   }
   async register(user:CreateRegisterDto){
      const {name,email,password,age,gender,address}=user;
      const isEmailExist=await this.findByEmail(email);
      if(isEmailExist){
         throw new ConflictException('Email đã tồn tại. Vui lòng đăng kí tài khoản khác!')
-     }
+     };
+     const userRole=await this.roleModel.findOne({name:USER_ROLE});
+
      let passwordNew=this.hashPassword(password);
      let newUserRegister=await this.userModel.create({
-        name,email,password:passwordNew,age,gender,address
+        name,email,password:passwordNew,age,gender,address,
+        role:userRole?._id
      });
      return newUserRegister;
   }
