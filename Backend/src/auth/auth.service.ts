@@ -6,21 +6,30 @@ import { CreateRegisterDto } from 'src/users/dto/create-user.dto';
 import { IUser } from 'src/users/interface/user.interface';
 import { UsersService } from 'src/users/users.service';
 import {Response} from 'express';
+import { RolesService } from 'src/roles/roles.service';
 @Injectable()
 export class AuthService {
-    constructor(private readonly userService:UsersService,private jwtService:JwtService,private readonly configService:ConfigService){}
+    constructor(private readonly userService:UsersService,private jwtService:JwtService,private readonly configService:ConfigService,private roleModel:RolesService){}
     async validateUser(email: string, pass: string): Promise<any> {
       const user = await this.userService.findByEmail(email);
       if(user){
           const isValid=this.userService.checkPasswordValid(pass,user?.password);
+          
           if(isValid){
-             return user;
+            const userRole=user.role as unknown as {_id:string,name:string};
+            const temp=await this.roleModel.findOne(userRole?._id);
+            const objUser={
+               ...user.toObject(),
+               permissions:temp?.permissions ?? []
+            }
+            return objUser;
           }
+         
       }
       return null;
     }
     async login(user: IUser,res:Response) {
-      const {_id,name,email,role}=user;
+      const {_id,name,email,role,permissions}=user;
       const payload={
           sub:"token login",
           iss:'from server',
@@ -43,6 +52,7 @@ export class AuthService {
           email,
           role
         },
+        permissions
       };
     }
     async register(user:CreateRegisterDto){
@@ -80,11 +90,24 @@ export class AuthService {
                const refreshToken=this.createRefreshToken(payload);
                // update save db refresh token
                await this.userService.updateRefreshToken(refreshToken,_id.toString());
+               const userRole=user.role as unknown as {_id:string,name:string};
+               const temp=await this.roleModel.findOne(userRole._id);
                res.clearCookie('refreshToken');
                res.cookie('refreshToken',refreshToken,{
                 maxAge:ms(this.configService.get<string>('JWT_SECRET_KEY_EXPIRESIN_REFRESH_TOKEN')),
                 httpOnly:true
-              })
+              });
+              return {
+                access_token: this.jwtService.sign(payload),
+                user:{
+                  _id,
+                  name,
+                  email,
+                  role
+                },
+                permissions:temp?.permissions ?? []
+              };
+
            }else{
               throw new BadRequestException('Token không hơp lệ or hết hạn')
            }

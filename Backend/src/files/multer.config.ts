@@ -46,7 +46,8 @@ export class MulterConfigService implements MulterOptionsFactory{
                     let baseName = path.basename(file.originalname, extName);
                     let finalName = `${baseName}-${Date.now()}${extName}`
                     cb(null, finalName)
-                }
+                },
+                
             })
         }
     }

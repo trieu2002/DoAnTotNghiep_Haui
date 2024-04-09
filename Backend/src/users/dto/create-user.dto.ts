@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsEmail, IsNotEmpty, IsNotEmptyObject, IsObject, ValidateNested } from "class-validator";
+import { IsEmail, IsMongoId, IsNotEmpty, IsNotEmptyObject, IsObject, ValidateNested } from "class-validator";
 import mongoose, { Types } from "mongoose";
 class Company{
      @IsNotEmpty()
@@ -22,6 +22,7 @@ export class CreateUserDto {
     @IsNotEmpty({message:"Address không được để trống"})
     address:string;
     @IsNotEmpty({message:"Role không được để trống"})
+    @IsMongoId({message:'role là mongoid'})
     role:string;
     @IsNotEmptyObject()
     @IsObject()

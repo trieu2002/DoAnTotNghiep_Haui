@@ -6,9 +6,10 @@ import { DUser, Public, ResponseMessage } from 'src/core/core';
 import { CreateRegisterDto } from 'src/users/dto/create-user.dto';
 import { Response ,Request} from 'express';
 import { IUser } from 'src/users/interface/user.interface';
+import { RolesService } from 'src/roles/roles.service';
 @Controller(AUTH_ROUTE)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService,private readonly roleService:RolesService) {}
   @Public()
   @UseGuards(LocalAuthGuard)
   @ResponseMessage('Login user')
@@ -24,7 +25,9 @@ export class AuthController {
   }
   @ResponseMessage('Get info user')
   @Get('/account')
-  handlerAccount(@DUser() user:IUser){
+  async handlerAccount(@DUser() user:IUser){
+    const temp=await this.roleService.findOne(user.role._id) as any;
+    user.permissions=temp;
     return {user};
   }
   @Public()

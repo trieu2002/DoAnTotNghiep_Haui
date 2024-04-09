@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRegisterDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,12 +10,19 @@ import { IUser } from './interface/user.interface';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
 import { isEmpty } from 'class-validator';
+import { Role, RoleDocument } from 'src/roles/schema/role.schema';
+import { USER_ROLE } from 'src/databases/simple';
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel:SoftDeleteModel<UserDocument>){}
+  constructor(
+    @InjectModel(User.name) private userModel:SoftDeleteModel<UserDocument>,
+    @InjectModel(Role.name) private  roleModel:SoftDeleteModel<RoleDocument>){}
   async create(createUserDto: CreateUserDto,user:IUser) {
     const {name,email,password,age,gender,address,role,company}=createUserDto;
     const isExistEmail=await this.findByEmail(email);
+    if(isExistEmail){
+       throw new ConflictException('Email đã tồn tại.Vui lòng chon tk khác!')
+    }
     const hashPassword=this.hashPassword(password);
     let newUser=await this.userModel.create({
       name,email,password:hashPassword,
@@ -64,10 +71,15 @@ export class UsersService {
     if(!mongoose.Types.ObjectId.isValid(id)){
       throw new NotFoundException('Not Found')
    };
-    return await this.userModel.findOne({_id:id}).select('-password');
+    return await this.userModel.findOne({_id:id}).select('-password').populate({path:'role',select:{name:1,_id:1}});
    
   }
   async update(updateUserDto: UpdateUserDto,user:IUser) {
+    const {email}=updateUserDto;
+    const isExistEmail=await this.findByEmail(email);
+    if(isExistEmail){
+       throw new ConflictException('Email đã tồn tại.Vui lòng chon tk khác!')
+    }
       const updated=await this.userModel.updateOne({
         _id:updateUserDto._id
       },
@@ -85,6 +97,10 @@ export class UsersService {
      if(!mongoose.Types.ObjectId.isValid(id)){
         throw new NotFoundException('Not Found')
      };
+     const foundUser=await this.userModel.findOne({_id:user?._id});
+     if(foundUser?.email==='admin@gmail.com'){
+        throw new BadRequestException('Không được xóa Admin');
+     }
      await this.userModel.updateOne({_id:id},{deletedBy:{_id:user?._id,email:user?.email}})
      return await this.userModel.softDelete({_id:id})
   }
@@ -97,17 +113,20 @@ export class UsersService {
       return compareSync(password,hash);
   }
   async findByEmail(email:string){
-     return await this.userModel.findOne({email}).lean();
+     return await this.userModel.findOne({email}).populate({path:'role',select:{name:1}})
   }
   async register(user:CreateRegisterDto){
      const {name,email,password,age,gender,address}=user;
      const isEmailExist=await this.findByEmail(email);
      if(isEmailExist){
         throw new ConflictException('Email đã tồn tại. Vui lòng đăng kí tài khoản khác!')
-     }
+     };
+     const userRole=await this.roleModel.findOne({name:USER_ROLE});
+
      let passwordNew=this.hashPassword(password);
      let newUserRegister=await this.userModel.create({
-        name,email,password:passwordNew,age,gender,address
+        name,email,password:passwordNew,age,gender,address,
+        role:userRole?._id
      });
      return newUserRegister;
   }
