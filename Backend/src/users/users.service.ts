@@ -16,6 +16,9 @@ export class UsersService {
   async create(createUserDto: CreateUserDto,user:IUser) {
     const {name,email,password,age,gender,address,role,company}=createUserDto;
     const isExistEmail=await this.findByEmail(email);
+    if(isExistEmail){
+       throw new ConflictException('Email đã tồn tại.Vui lòng chon tk khác!')
+    }
     const hashPassword=this.hashPassword(password);
     let newUser=await this.userModel.create({
       name,email,password:hashPassword,
@@ -68,6 +71,11 @@ export class UsersService {
    
   }
   async update(updateUserDto: UpdateUserDto,user:IUser) {
+    const {email}=updateUserDto;
+    const isExistEmail=await this.findByEmail(email);
+    if(isExistEmail){
+       throw new ConflictException('Email đã tồn tại.Vui lòng chon tk khác!')
+    }
       const updated=await this.userModel.updateOne({
         _id:updateUserDto._id
       },
