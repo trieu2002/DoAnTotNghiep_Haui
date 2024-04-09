@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRegisterDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -64,7 +64,7 @@ export class UsersService {
     if(!mongoose.Types.ObjectId.isValid(id)){
       throw new NotFoundException('Not Found')
    };
-    return await this.userModel.findOne({_id:id}).select('-password');
+    return await this.userModel.findOne({_id:id}).select('-password').populate({path:'role',select:{name:1,_id:1}});
    
   }
   async update(updateUserDto: UpdateUserDto,user:IUser) {
@@ -85,6 +85,10 @@ export class UsersService {
      if(!mongoose.Types.ObjectId.isValid(id)){
         throw new NotFoundException('Not Found')
      };
+     const foundUser=await this.userModel.findOne({_id:user?._id});
+     if(foundUser?.email==='admin@gmail.com'){
+        throw new BadRequestException('Không được xóa Admin');
+     }
      await this.userModel.updateOne({_id:id},{deletedBy:{_id:user?._id,email:user?.email}})
      return await this.userModel.softDelete({_id:id})
   }
@@ -97,7 +101,7 @@ export class UsersService {
       return compareSync(password,hash);
   }
   async findByEmail(email:string){
-     return await this.userModel.findOne({email}).lean();
+     return await this.userModel.findOne({email}).populate({path:'role',select:{name:1,permissions:1}})
   }
   async register(user:CreateRegisterDto){
      const {name,email,password,age,gender,address}=user;
