@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ResumesService } from './resumes.service';
 import { CreateUserCvDto } from './dto/create-resume.dto';
-import { DUser, ResponseMessage } from 'src/core/core';
+import { DUser, Public, ResponseMessage } from 'src/core/core';
 import { IUser } from 'src/users/interface/user.interface';
 
 @Controller('resumes')
@@ -15,11 +15,13 @@ export class ResumesController {
   }
   @ResponseMessage('Fetch resume by paginate')
   @Get()
+  @Public()
   findAll(@Query('current') page:string,@Query('pageSize') pageSize:string,@Query() qs:string) {
     return this.resumesService.findAll(+page,+pageSize,qs);
   }
 
   @Get(':id')
+  @Public()
   @ResponseMessage('fetch resume by id')
   findOne(@Param('id') id: string) {
     return this.resumesService.findOne(id);
