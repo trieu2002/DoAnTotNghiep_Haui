@@ -31,7 +31,7 @@ export class UsersController {
   update(@Body() updateUserDto: UpdateUserDto,@DUser() user:IUser) {
     return this.usersService.update(updateUserDto,user);
   }
-  @ResponseMessage('Remove user')
+  @ResponseMessage('Remove user new')
   @Delete(':id')
   remove(@Param('id') id: string,@DUser() user:IUser) {
     return this.usersService.remove(id,user);
