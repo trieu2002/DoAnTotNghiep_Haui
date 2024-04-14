@@ -31,8 +31,9 @@ const LayoutAdmin = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [activeMenu, setActiveMenu] = useState('');
     const user = useAppSelector(state => state.account.user);
-
+    console.log('user',user);
     const permissions = useAppSelector(state => state.account.user.permissions);
+    console.log('permissions',permissions);
     const [menuItems, setMenuItems] = useState<MenuProps['items']>([]);
 
     const navigate = useNavigate();
@@ -68,7 +69,7 @@ const LayoutAdmin = () => {
             const viewPermission = permissions.find(item =>
                 item.apiPath === ALL_PERMISSIONS.PERMISSIONS.GET_PAGINATE.apiPath
                 && item.method === ALL_PERMISSIONS.USERS.GET_PAGINATE.method
-            )
+            );
 
             const full = [
                 {

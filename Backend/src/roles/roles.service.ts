@@ -13,7 +13,7 @@ export class RolesService {
   constructor(@InjectModel(Role.name) private roleModel:SoftDeleteModel<RoleDocument>){}
   async create(createRoleDto: CreateRoleDto,user:IUser) {
      const {name,description,isActive,permissions}=createRoleDto;
-     const isExist=await this.roleModel.findOne({name});
+     const isExist=await this.roleModel.findOne({name}); 
      if(isExist){
         throw new ConflictException('Role này đã tồn tại!')
      };
@@ -66,7 +66,8 @@ export class RolesService {
     if(!mongoose.Types.ObjectId.isValid(id)){
        throw new NotFoundException("Không tinm tháy quyền này");
     }
-    return (await this.roleModel.findOne({_id:id})).populate({path:'permissions',select:{_id:1,apiPath:1,name:1,method:1,module:1}})
+   return (await this.roleModel.findOne({_id:id})
+    .populate({path:'permissions',select:{_id:1,apiPath:1,name:1,method:1,module:1}}))
   }
 
   async update(id: string, updateRoleDto: UpdateRoleDto,user:IUser) {

@@ -1,15 +1,15 @@
 export interface IUser{
     _id:string;
-    name:string;
     email:string;
+    name:string;
     role:{
-       _id:string,
-       name:string
+        _id:string,
+        email:string
     },
     permissions?:{
-        _id:string,
-        name:string,
-        apiPath:string,
+        _id:string;
+        name:string;
+        apiPath:string;
         module:string
     }[]
 }
