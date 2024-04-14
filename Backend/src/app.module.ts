@@ -11,6 +11,7 @@ import { ResumesModule } from './resumes/resumes.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { DatabasesModule } from './databases/databases.module';
+import { SubscribersModule } from './subscribers/subscribers.module';
 @Module({
   imports: [
     MongooseModule.forRootAsync({
@@ -35,7 +36,8 @@ import { DatabasesModule } from './databases/databases.module';
     ResumesModule,
     RolesModule,
     PermissionsModule,
-    DatabasesModule
+    DatabasesModule,
+    SubscribersModule
 ],
   controllers: [],
   providers: [], 
