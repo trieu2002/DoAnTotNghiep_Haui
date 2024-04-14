@@ -5,18 +5,18 @@ import { Permission } from 'src/permissions/schema/permission.schema';
 
 export type RoleDocument = HydratedDocument<Role>;
 @Schema({
-    timestamps:true,
-    versionKey:false
+  timestamps:true,
+  versionKey:false
 })
 export class Role {
   @Prop()
-  name: string;
+  name:string;
   @Prop()
-  description: string;
+  description:string;
   @Prop()
   isActive:Boolean
   @Prop({type:[mongoose.Schema.Types.ObjectId],ref:Permission.name})
-  permissions: Permission[];
+  permissions:Permissions[]
   @Prop()
   createdAt:Date
   @Prop()
@@ -30,13 +30,13 @@ export class Role {
   }
   @Prop({type:Object})
   updatedBy:{
-       _id:mongoose.Schema.Types.ObjectId,
-       email:string
+      _id:mongoose.Schema.Types.ObjectId,
+      email:string
   }
   @Prop({type:Object})
   deletedBy:{
-       _id:mongoose.Schema.Types.ObjectId,
-       email:string
+      _id:mongoose.Schema.Types.ObjectId,
+      email:string
   }
 }
 

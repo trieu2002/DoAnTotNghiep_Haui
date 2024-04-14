@@ -62,7 +62,7 @@ export class DatabasesService implements OnModuleInit{
                 },
                 {
                     name: "Nguyễn Hải Triều",
-                    email: "trieunguyenbaby13@gmail.com",
+                    email: "hoidanit@gmail.com",
                     password: this.userService.hashPassword(this.configService.get<string>("INIT_PASSWORD")),
                     age: 96,
                     gender: "MALE",

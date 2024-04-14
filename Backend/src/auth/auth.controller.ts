@@ -27,7 +27,9 @@ export class AuthController {
   @Get('/account')
   async handlerAccount(@DUser() user:IUser){
     const temp=await this.roleService.findOne(user.role._id) as any;
-    user.permissions=temp;
+    console.log('temp',temp);
+    user.permissions=temp.permissions;
+    console.log('user',user);
     return {user};
   }
   @Public()
