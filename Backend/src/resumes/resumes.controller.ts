@@ -3,8 +3,9 @@ import { ResumesService } from './resumes.service';
 import { CreateUserCvDto } from './dto/create-resume.dto';
 import { DUser, Public, ResponseMessage } from 'src/core/core';
 import { IUser } from 'src/users/interface/user.interface';
+import { AUTH_ROUTE, RESUMES_ROUTE } from 'src/const/const';
 
-@Controller('resumes')
+@Controller(RESUMES_ROUTE)
 export class ResumesController {
   constructor(private readonly resumesService: ResumesService) {}
 

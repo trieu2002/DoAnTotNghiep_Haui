@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { IUser } from 'src/users/interface/user.interface';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
-
+import { isEmpty } from 'class-validator';
 @Injectable()
 export class RolesService {
   constructor(@InjectModel(Role.name) private roleModel:SoftDeleteModel<RoleDocument>){}
@@ -15,7 +15,7 @@ export class RolesService {
      const {name,description,isActive,permissions}=createRoleDto;
      const isExist=await this.roleModel.findOne({name}); 
      if(isExist){
-        throw new ConflictException('Role này đã tồn tại!')
+        throw new ConflictException('Role này đã tồn tại!');
      };
      const newRole=await this.roleModel.create({
        name,description,isActive,permissions,

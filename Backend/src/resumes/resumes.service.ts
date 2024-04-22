@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Resume, ResumeDocument } from './schema/resume.schema';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
+import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class ResumesService {
@@ -14,6 +15,7 @@ export class ResumesService {
        const {url,companyId,jobId}=createUserCvDto;
        const {email,_id}=user;
        const newCV=await this.resumeModel.create({
+          userId:_id,
           url,companyId,jobId,status:'PENDING',
           createdBy:{
             _id:user?._id,
@@ -84,6 +86,7 @@ export class ResumesService {
       const updated=await this.resumeModel.updateOne({
         _id:id
       },{
+        status,
         updatedBy:{
           _id:user?._id,
           email:user?.email
@@ -115,18 +118,19 @@ export class ResumesService {
     return await this.resumeModel.softDelete({_id:id})
   }
   async findResumeByUser(user:IUser){
-     return await this.resumeModel.find({
-        userId:user?._id
-     })
-     .sort("-createdAt")
-     .populate([
-        {
-          path:'companyId',
-          select:{name:1}
-        },{
-          path:'jobId',
-          select:{name:1}
-        }
-     ])
+
+     const data=await this.resumeModel.find({userId:user._id}).sort('-createdAt')
+    .populate([
+     {
+       path:'companyId',
+       select:{name:1}
+     },
+     {
+       path:'jobId',
+       select:{name:1}
+     }
+    ])
+     console.log('data',data);
+     return data;
   }
 }
