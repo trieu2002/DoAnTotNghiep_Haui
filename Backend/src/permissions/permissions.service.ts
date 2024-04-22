@@ -7,6 +7,7 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { Permission, PermissionDocument } from './schema/permission.schema';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
+import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class PermissionsService {
