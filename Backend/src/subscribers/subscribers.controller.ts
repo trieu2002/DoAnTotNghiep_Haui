@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { SubscribersService } from './subscribers.service';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
-import { DUser, ResponseMessage } from 'src/core/core';
+import { DUser, ResponseMessage, SkipCheckPermission } from 'src/core/core';
 import { IUser } from 'src/users/interface/user.interface';
 
 @Controller('subscribers')
@@ -24,15 +24,22 @@ export class SubscribersController {
   findOne(@Param('id') id: string) {
     return this.subscribersService.findOne(id);
   }
+  @SkipCheckPermission()
   @ResponseMessage("Update subscriber")
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubscriberDto: UpdateSubscriberDto,@DUser() user:IUser) {
-    return this.subscribersService.update(id, updateSubscriberDto,user);
+  @Patch()
+  update( @Body() updateSubscriberDto: UpdateSubscriberDto,@DUser() user:IUser) {
+    return this.subscribersService.update( updateSubscriberDto,user);
   }
   
   @ResponseMessage("Delete a Subscribers")
   @Delete(':id')
   remove(@Param('id') id: string,@DUser() user:IUser) {
     return this.subscribersService.remove(id,user);
+  }
+  @Post('skills')
+  @ResponseMessage('Get subscribers')
+  @SkipCheckPermission()
+  getUserSkills(@DUser() user:IUser){
+     return this.subscribersService.getSkills(user);
   }
 }
