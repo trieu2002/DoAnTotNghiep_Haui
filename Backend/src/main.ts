@@ -5,7 +5,7 @@ import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
-import { VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { HttpExceptionFilter } from './core/http-exception.filter';
 import  cookieParser from 'cookie-parser';
 async function bootstrap() {
@@ -19,6 +19,9 @@ async function bootstrap() {
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.use(cookieParser());
   app.setViewEngine('ejs');
+  app.useGlobalPipes(new ValidationPipe({
+     whitelist:true
+  }))
   // config cors
   app.enableCors({
     origin:true,
