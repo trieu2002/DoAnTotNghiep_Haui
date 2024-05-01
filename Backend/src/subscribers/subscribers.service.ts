@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
 import { IUser } from 'src/users/interface/user.interface';
@@ -6,7 +6,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Subscriber, SubscriberDocument } from './schema/subscriber.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import aqp from 'api-query-params';
-import { isEmpty } from 'class-validator';
+import { IsEmpty } from 'class-validator';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class SubscribersService {
@@ -40,7 +41,7 @@ export class SubscribersService {
     const totalItems=(await this.subscriberModel.find(filter)).length;
     const totalPages=Math.ceil(totalItems/defaultPageSize);
     //@ts-ignore
-    if(isEmpty(sort)){
+    if(IsEmpty(sort)){
       //@ts-ignore:
        sort='-updatedAt';
     }
@@ -62,15 +63,35 @@ export class SubscribersService {
     }
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} subscriber`;
+  async findOne(id: string) {
+     if(!mongoose.Types.ObjectId.isValid(id)){
+        throw new NotFoundException(`Not Found subscriber`)
+     };
+     return await this.subscriberModel.findOne({_id:id})
+
   }
 
-  update(id: string, updateSubscriberDto: UpdateSubscriberDto,user:IUser) {
-    return `This action updates a #${id} subscriber`;
+  async update(id: string, updateSubscriberDto: UpdateSubscriberDto,user:IUser) {
+     const updated=await this.subscriberModel.updateOne({_id:id},{
+       ...updateSubscriberDto,
+       updatedBy:{
+        _id:user?._id,
+        email:user?.email
+       }
+     });
+     return updated;
   }
 
-  remove(id: string,user:IUser) {
-    return `This action removes a #${id} subscriber`;
+  async remove(id: string,user:IUser) {
+    if(!mongoose.Types.ObjectId.isValid(id)){
+      throw new NotFoundException(`Not Found subscriber`)
+   };
+   await this.subscriberModel.updateOne({_id:id},{
+    deletedBy:{
+       _id:user?._id,
+       email:user?.email
+    }
+  });
+  return await this.subscriberModel.softDelete({_id:id})
   }
 }
