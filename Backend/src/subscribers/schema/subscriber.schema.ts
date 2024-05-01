@@ -22,13 +22,13 @@ export class Subscriber {
   isDeleted:Boolean
   @Prop({type:Object})
   createdBy:{
-      _id:mongoose.Schema.Types.ObjectId,
+    _id:mongoose.Schema.Types.ObjectId,
       email:string
   }
   @Prop({type:Object})
   updatedBy:{
-       _id:mongoose.Schema.Types.ObjectId,
-       email:string
+    _id:mongoose.Schema.Types.ObjectId,
+    email:string
   }
   @Prop({type:Object})
   deletedBy:{

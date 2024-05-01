@@ -5,7 +5,7 @@ import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { VersioningType } from '@nestjs/common';
 import { HttpExceptionFilter } from './core/http-exception.filter';
 import  cookieParser from 'cookie-parser';
 async function bootstrap() {
