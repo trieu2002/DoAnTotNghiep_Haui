@@ -8,6 +8,7 @@ import { TransformInterceptor } from './core/transform.interceptor';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { HttpExceptionFilter } from './core/http-exception.filter';
 import  cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
@@ -22,6 +23,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({
      whitelist:true
   }))
+  
   // config cors
   app.enableCors({
     origin:true,
@@ -34,7 +36,8 @@ async function bootstrap() {
   app.enableVersioning({
     type:VersioningType.URI,
     defaultVersion:['1','2']
-  })
+  });
+  app.use(helmet())
   app.useGlobalFilters(new HttpExceptionFilter());
   await app.listen(PORT);
 }
