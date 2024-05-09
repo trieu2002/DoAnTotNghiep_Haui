@@ -9,14 +9,20 @@ import { Link, useNavigate } from 'react-router-dom';
 import styles from 'styles/client.module.scss';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import queryString from 'query-string';
 dayjs.extend(relativeTime)
-
+interface IQuery{
+    name?:string,
+    location?:string,
+    skills?:string                                      
+}
 interface IProps {
     showPagination?: boolean;
+    searchQuery?:Object
 }
 
 const JobCard = (props: IProps) => {
-    const { showPagination = false } = props;
+    const { showPagination = false,searchQuery } = props;
 
     const [displayJob, setDisplayJob] = useState<IJob[] | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -30,7 +36,7 @@ const JobCard = (props: IProps) => {
 
     useEffect(() => {
         fetchJob();
-    }, [current, pageSize, filter, sortQuery]);
+    }, [current, pageSize, filter, sortQuery,searchQuery]);
 
     const fetchJob = async () => {
         setIsLoading(true)
@@ -41,8 +47,25 @@ const JobCard = (props: IProps) => {
         if (sortQuery) {
             query += `&${sortQuery}`;
         }
+        if(searchQuery){
+            const {name, skills, location}: IQuery = searchQuery;
+            if(name){
+                query+=`&name=/${name}/i`;
+            }
+            if(skills){
+              
+                const skillsString = skills.split(",").join(",");
+                console.log('skills',skillsString);
+                query += `&skills=/${skillsString}/i`;
+            }
+            if(location){
+                query+=`&location=/${location}/i`;
+            }
+        }
+        console.log('query',query)
 
         const res = await callFetchJob(query);
+        console.log('res',res);
         if (res && res.data) {
             setDisplayJob(res.data.result);
             setTotal(res.data.meta.total)
