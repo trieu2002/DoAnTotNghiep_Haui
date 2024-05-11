@@ -1,12 +1,12 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRegisterDto, CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto, UpdateUserNormal } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schema/user.schema';
 import {genSaltSync,hashSync,compareSync} from 'bcryptjs';
 import { SALT } from 'src/const/const';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-import { IUser } from './interface/user.interface';
+import { IRole, IUser } from './interface/user.interface';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
 import { isEmpty } from 'class-validator';
@@ -97,7 +97,7 @@ export class UsersService {
      if(!mongoose.Types.ObjectId.isValid(id)){
         throw new NotFoundException('Not Found')
      };
-     const foundUser=await this.userModel.findOne({_id:user?._id});
+     const foundUser=await this.userModel.findById(id);
      if(foundUser?.email==='admin@gmail.com'){
         throw new BadRequestException('Không được xóa Admin');
      }
@@ -136,5 +136,83 @@ export class UsersService {
   async findUserByToken(refreshToken:string){
     return await this.userModel.findOne({refreshToken});
   }
-
+  async updateUserNormal(user:IUser,updateUserNormal:UpdateUserNormal){
+     const userUpdate=await this.userModel.findOne({_id:user?._id});
+     console.log('<<<<<<< userssss >>>>>>>',userUpdate);
+     const updated= await this.userModel.updateOne({_id:user?._id},{
+       ...updateUserNormal,
+       updatedBy:{
+         _id:user?._id,
+         email:user?.email
+       }
+     })
+     return updated;
+  }
+  async upsertUserSocial(type,dataRaw){
+       console.log(dataRaw,'data');
+       try {
+        let user=null;
+         if(type==='GOOGLE'){
+          const userRole=await this.roleModel.findOne({name:USER_ROLE});
+             user=await this.userModel.findOne({typeAcc:type,email:dataRaw.email});
+             if(!user){
+                await this.userModel.create({
+                  email:dataRaw.email,
+                  name:dataRaw.username,
+                  typeAcc:type,
+                  role:userRole?._id
+                })
+             }
+         };
+         if(type==='FACEBOOK'){
+          const userRole=await this.roleModel.findOne({name:USER_ROLE});
+             user=await this.userModel.findOne({typeAcc:type,email:dataRaw.email});
+             if(!user){
+                await this.userModel.create({
+                  email:dataRaw.email,
+                  name:dataRaw.username,
+                  typeAcc:type,
+                  role:userRole?._id
+                })
+             }
+         };
+         return user;
+       } catch (error) {
+         console.log(error);
+       }
+  }
+  async findUserLoginGoogle(id: string) {
+    const user = await this.findOne(id);
+    console.log('user1', user);
+    if (!user || !user.role) {
+        // Xử lý khi không tìm thấy user hoặc user không có role
+        return null;
+    }
+    const userRole:IRole = user.role as unknown as {_id:string,name:string};
+    const temp =(await this.roleModel.findOne({_id:id})
+    .populate({path:'permissions',select:{_id:1,apiPath:1,name:1,method:1,module:1}}))
+    console.log('temp',temp);
+    const objUser = {
+        ...user.toObject(),
+        permissions: temp?.permissions ?? []
+    };
+    return objUser;
+ }
+ async findUserLoginFacebook(id: string) {
+  const user = await this.findOne(id);
+  console.log('user1', user);
+  if (!user || !user.role) {
+      // Xử lý khi không tìm thấy user hoặc user không có role
+      return null;
+  }
+  const userRole:IRole = user.role as unknown as {_id:string,name:string};
+  const temp =(await this.roleModel.findOne({_id:id})
+  .populate({path:'permissions',select:{_id:1,apiPath:1,name:1,method:1,module:1}}))
+  console.log('temp',temp);
+  const objUser = {
+      ...user.toObject(),
+      permissions: temp?.permissions ?? []
+  };
+  return objUser;
+}
 }

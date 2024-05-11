@@ -8,6 +8,7 @@ import { IUser } from 'src/users/interface/user.interface';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
 import { isEmpty } from 'class-validator';
+import { ADMIN_ROLE } from 'src/databases/simple';
 @Injectable()
 export class RolesService {
   constructor(@InjectModel(Role.name) private roleModel:SoftDeleteModel<RoleDocument>){}
@@ -62,10 +63,7 @@ export class RolesService {
     }
   }
 
-  async findOne(id: string) {
-    if(!mongoose.Types.ObjectId.isValid(id)){
-       throw new NotFoundException("Không tinm tháy quyền này");
-    }
+  async findOne(id: string) { 
    return (await this.roleModel.findOne({_id:id})
     .populate({path:'permissions',select:{_id:1,apiPath:1,name:1,method:1,module:1}}))
   }
@@ -87,15 +85,17 @@ export class RolesService {
   }
 
   async remove(id: string,user:IUser) {
+     console.log('id',id);
     if(!mongoose.Types.ObjectId.isValid(id)){
       throw new NotFoundException("Không tinm tháy quyền này");
    };
-  const foundRole=await this.roleModel.findOne({_id:user?._id});
-  if(foundRole.name==='ADMIN'){
+  const foundRole=await this.roleModel.findById(id);
+  console.log('role',foundRole);
+  if(foundRole?.name===ADMIN_ROLE){
      throw new BadRequestException("Không được xóa role ADMIN");
   }
    await this.roleModel.updateOne({
-      _Id:IDBCursorWithValue
+      _id:id
    },{
       deletedBy:{
          _id:user?._id,

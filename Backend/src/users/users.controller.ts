@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto, UpdateUserNormal } from './dto/update-user.dto';
 import { USER_ROUTE } from 'src/const/const';
 import { DUser, Public, ResponseMessage } from 'src/core/core';
 import { IUser } from './interface/user.interface';
@@ -35,5 +35,10 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string,@DUser() user:IUser) {
     return this.usersService.remove(id,user);
+  }
+  @ResponseMessage("Update user normal")
+  @Patch("/update-profile")
+  updateUserNormal(@DUser() user:IUser,@Body() updateUserNormal:UpdateUserNormal){
+      return this.usersService.updateUserNormal(user,updateUserNormal);
   }
 }

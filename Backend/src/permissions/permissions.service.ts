@@ -14,10 +14,7 @@ export class PermissionsService {
   constructor(@InjectModel(Permission.name) private permissionModel:SoftDeleteModel<PermissionDocument>){}
   async create(createPermissionDto: CreatePermissionDto,user:IUser) {
      const {name,apiPath,method,module}=createPermissionDto;
-     const isExist=await this.permissionModel.findOne({apiPath,method});
-     if(isExist){
-       throw new ConflictException("Permission này đã tồn tại!");
-     };
+    
      const newPermission=await this.permissionModel.create({
         name,apiPath,method,module,
         createdBy:{

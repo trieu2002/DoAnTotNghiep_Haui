@@ -5,8 +5,10 @@ import ms from 'ms';
 import { CreateRegisterDto } from 'src/users/dto/create-user.dto';
 import { IUser } from 'src/users/interface/user.interface';
 import { UsersService } from 'src/users/users.service';
-import {Response} from 'express';
+import {Response,Request} from 'express';
 import { RolesService } from 'src/roles/roles.service';
+
+
 @Injectable()
 export class AuthService {
     constructor(private readonly userService:UsersService,private jwtService:JwtService,private readonly configService:ConfigService,private roleModel:RolesService){}
@@ -29,12 +31,13 @@ export class AuthService {
       return null;
     }
     async login(user: IUser,res:Response) {
-      const {_id,name,email,role,permissions}=user;
+      const {_id,name,email,address,age,gender,role,permissions}=user;
       const payload={
           sub:"token login",
           iss:'from server',
           _id,
-          name,email,role
+          name,email,role,
+          address,gender,age
       }
         const refreshToken=this.createRefreshToken(payload);
         // update save db refresh token
@@ -50,6 +53,9 @@ export class AuthService {
           _id,
           name,
           email,
+          address,
+          age,
+          gender,
           role
         },
         permissions
@@ -80,12 +86,14 @@ export class AuthService {
            let user=await this.userService.findUserByToken(refreshToken);
            if(user){
                // update refresh token 
-               const {_id,name,email,role}=user;
+               const {_id,name,email,role,address,age,gender}=user;
                const payload={
                    sub:"token login",
                    iss:'from server',
                    _id,
-                   name,email,role
+                   name,email,role,
+                   address,
+                   age,gender
                }
                const refreshToken=this.createRefreshToken(payload);
                // update save db refresh token
@@ -103,7 +111,11 @@ export class AuthService {
                   _id,
                   name,
                   email,
-                  role
+                  role,
+                  gender,
+                  age,
+                  address
+                  
                 },
                 permissions:temp?.permissions ?? []
               };
@@ -120,5 +132,88 @@ export class AuthService {
         res.clearCookie('refreshToken');
         return 'OK'; 
     }
+    async googleAuthRedirect(req:Request,res:Response){
+      const user:IUser=req.user;
+      if(user){
+         return res.redirect(`http://localhost:3000/login?id=${user?._id}`);
+      }else{
+        return res.redirect(`http://localhost:3000/login`);
+      }
+    }
+    async loginGoogle(id: string, req: Request, res: Response) {
+      const user = await this.userService.findUserLoginGoogle(id);
+      const { _id, name, email, role, permissions } = user;
+      const payload = {
+          sub: "token login",
+          iss: 'from server',
+          _id,
+          name,
+          email,
+          role
+      }
+      const token = this.jwtService.sign(payload);
+      console.log('token', token);
+  
+      const refreshToken = this.createRefreshToken(payload);
+      // update save db refresh token
+      await this.userService.updateRefreshToken(refreshToken, _id.toString());
+      // set cookie refresh token
+      res.cookie('refreshToken', refreshToken, {
+          maxAge: ms(this.configService.get<string>('JWT_SECRET_KEY_EXPIRESIN_REFRESH_TOKEN')),
+          httpOnly: true
+      })
+      return {
+          access_token: token,
+          user: {
+              _id,
+              name,
+              email,
+              role
+          },
+          permissions
+      };
+  }
+  async facebookLoginRedirect(req:Request,res:Response){
+    const user:IUser=req.user;
+    if(user){
+       return res.redirect(`http://localhost:3000/login?idF=${user?._id}`);
+    }else{
+      return res.redirect(`http://localhost:3000/login`);
+    }
+  }
+  async loginFacebook(idF: string, req: Request, res: Response){
+    const user = await this.userService.findUserLoginFacebook(idF);
+    const { _id, name, email, role, permissions } = user;
+    const payload = {
+        sub: "token login",
+        iss: 'from server',
+        _id,
+        name,
+        email,
+        role
+    }
+    const token = this.jwtService.sign(payload);
+    console.log('token', token);
+
+    const refreshToken = this.createRefreshToken(payload);
+    // update save db refresh token
+    await this.userService.updateRefreshToken(refreshToken, _id.toString());
+    // set cookie refresh token
+    res.cookie('refreshToken', refreshToken, {
+        maxAge: ms(this.configService.get<string>('JWT_SECRET_KEY_EXPIRESIN_REFRESH_TOKEN')),
+        httpOnly: true
+    })
+    return {
+        access_token: token,
+        user: {
+            _id,
+            name,
+            email,
+            role
+        },
+        permissions
+    };
+  }
+   
 
 }

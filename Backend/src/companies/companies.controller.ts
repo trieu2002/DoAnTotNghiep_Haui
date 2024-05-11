@@ -37,4 +37,10 @@ export class CompaniesController {
   remove(@Param('id') id: string,@DUser() user:IUser) {
     return this.companiesService.remove(id,user);
   }
+  @ResponseMessage("Get companies post job the most")
+  @Post('/top-5')
+  getCompanyPostJob(){
+    return this.companiesService.getCompanyPostJob();
+  }
+  
 }

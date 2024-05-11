@@ -10,7 +10,7 @@ export class CreateRoleDto {
     @IsBoolean({message:"IsActive là kieur boolean"})
     isActive:Boolean;
     @IsNotEmpty({message:"Permisison không được để trống"})
-    @IsMongoId({message:"Permisson có kiểu mongoid"})
+    @IsMongoId({each:true,message:"Permisson có kiểu mongoid"})
     @IsArray({message:'Permission có dạng array'})
     permissions:mongoose.Schema.Types.ObjectId[]
 

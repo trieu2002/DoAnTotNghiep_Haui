@@ -9,6 +9,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './passport/jwt.strategy';
 import ms from 'ms';
 import { RolesModule } from 'src/roles/roles.module';
+import { GoogleStrategy } from './passport/google.strategy';
+import { FacebookStrategy } from './passport/facebook.strategy';
 
 @Module({
   imports:[UsersModule,PassportModule,JwtModule.registerAsync({
@@ -22,6 +24,6 @@ import { RolesModule } from 'src/roles/roles.module';
     inject: [ConfigService],
   }),RolesModule],
   controllers: [AuthController],
-  providers: [AuthService,LocalStrategy,JwtStrategy],
+  providers: [AuthService,LocalStrategy,JwtStrategy,GoogleStrategy,FacebookStrategy],
 })
 export class AuthModule {}
