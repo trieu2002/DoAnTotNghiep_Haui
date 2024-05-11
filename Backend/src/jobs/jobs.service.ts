@@ -13,7 +13,10 @@ import { isEmpty } from 'class-validator';
 export class JobsService {
   constructor(@InjectModel(Job.name) private jobModel:SoftDeleteModel<JobDocument>){}
   async create(createJobDto: CreateJobDto,user:IUser) {
-    const newJob=await this.jobModel.create({...createJobDto,createdBy:{
+    const {name,skills,company,salary,quantity,level,description,startDate,endDate,isActive}=createJobDto;
+    const newJob=await this.jobModel.create({name,skills,company,salary,quantity,level,description,
+      startDate,endDate,isActive,
+      createdBy:{
        _id:user?._id,
        email:user?.email
     }});

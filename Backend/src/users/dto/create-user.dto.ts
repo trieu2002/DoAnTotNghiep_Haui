@@ -23,7 +23,7 @@ export class CreateUserDto {
     address:string;
     @IsNotEmpty({message:"Role không được để trống"})
     @IsMongoId({message:'role là mongoid'})
-    role:string;
+    role:mongoose.Schema.Types.ObjectId;
     @IsNotEmptyObject()
     @IsObject()
     @ValidateNested()
@@ -44,4 +44,5 @@ export class CreateRegisterDto {
     gender:string;
     @IsNotEmpty({message:"Address không được để trống"})
     address:string;
+    typeAcc:string
 }

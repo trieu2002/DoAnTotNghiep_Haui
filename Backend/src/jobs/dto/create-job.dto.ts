@@ -14,7 +14,7 @@ export class CreateJobDto {
     name:string;
     @IsNotEmpty({message:'Skills không được để trống'})
     @IsArray({message:'Skills có định dạng mảng'})
-    @IsString({message:'Skills có kiểu chuỗi'})
+    @IsString({message:'Skills có kiểu chuỗi',each:true})
     skills:string[];
     @IsNotEmptyObject()
     @IsObject()
@@ -38,7 +38,7 @@ export class CreateJobDto {
     @IsNotEmpty({message:'EndĐate không được để trống'})
     @Transform(({value})=> new Date(value))
     @IsDate({message:"EndĐate có dịnh dạng Datte"})
-    endSDate:Date
+    endDate:Date
     @IsNotEmpty({message:"IsActive không đưuọc để trống"})
     @IsBoolean({message:'IsActive có kiểu là boolean'})
     isActive:Boolean

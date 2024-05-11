@@ -52,7 +52,7 @@ const CompanyPage = () => {
             render: (text, record, index) => {
                 return (
                     <>
-                        {(index + 1) + (meta.current - 1) * (meta.pageSize)}
+                        {(index + 1)}
                     </>)
             },
             hideInSearch: true,

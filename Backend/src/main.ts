@@ -24,12 +24,12 @@ async function bootstrap() {
      whitelist:true
   }))
   
-  // config cors
   app.enableCors({
-    origin:true,
-    methods:['GET','POST','DELETE','PUT','PATCH'],
-    credentials:true
-  });;
+    origin: 'http://localhost:3000', // Thay đổi thành origin của ứng dụng frontend của bạn
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+   
+  });
   const configService=app.get(ConfigService);
   const PORT=configService.get<number>('PORT');
   app.setGlobalPrefix("api");

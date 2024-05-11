@@ -8,6 +8,13 @@ Module Auth
 export const callRegister = (name: string, email: string, password: string, age: number, gender: string, address: string) => {
     return axios.post<IBackendRes<IUser>>('/api/v1/auth/register', { name, email, password, age, gender, address })
 }
+export const callLoginGoogle=(id:string)=>{
+    return axios.post<IBackendRes<IAccount>>("/api/v1/auth/loginGoogle-success",{id});
+}
+
+export const callLoginFacebook=(idF:string)=>{
+    return axios.post<IBackendRes<IAccount>>("/api/v1/auth/loginFacebook-success",{idF});
+}
 
 export const callLogin = (email: string, password: string) => {
     return axios.post<IBackendRes<IAccount>>('/api/v1/auth/login', { email, password })
@@ -90,7 +97,16 @@ export const callDeleteUser = (id: string) => {
 export const callFetchUser = (query: string) => {
     return axios.get<IBackendRes<IModelPaginate<IUser>>>(`/api/v1/users?${query}`);
 }
-
+interface IUserProfile{
+    name:string,
+    email:string,
+    age:number,
+    gender:string,
+    address:string
+}
+export const callUpdateProfile=(user:IUserProfile)=>{
+    return axios.patch<IBackendRes<IUser>>(`/api/v1/users/update-profile`,{...user})
+}
 /**
  * 
 Module Job

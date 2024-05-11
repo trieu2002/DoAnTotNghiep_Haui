@@ -8,10 +8,13 @@ import { IUser } from 'src/users/interface/user.interface';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
 import { isEmpty } from 'class-validator';
+import { Job, JobDocument } from 'src/jobs/schema/job.schema';
 
 @Injectable()
 export class CompaniesService {
-  constructor(@InjectModel(Company.name) private companyModel:SoftDeleteModel<CompanyDocument>){}
+  constructor(@InjectModel(Company.name) private companyModel:SoftDeleteModel<CompanyDocument>,
+  @InjectModel(Job.name) private jobModel:SoftDeleteModel<JobDocument>
+){}
   async create(createCompanyDto: CreateCompanyDto,user:IUser) {
     return await this.companyModel.create({...createCompanyDto,createdBy:{
        _id:user?._id,
@@ -88,5 +91,31 @@ export class CompaniesService {
     return await this.companyModel.softDelete({
       _id:id
     })
+  }
+  async getCompanyPostJob(){
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const companies = await this.jobModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: oneMonthAgo } // Lọc các tin tuyển dụng trong tháng qua
+        }
+      },
+      {
+        $group: {
+          _id: "$company._id",
+          name: { $first: "$company.name" },
+          totalJobs: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { totalJobs: -1 } // Sắp xếp theo số lượng tin tuyển dụng giảm dần
+      },
+      {
+        $limit: 5 // Chọn ra 5 công ty đứng đầu
+      }
+    ]);
+
+    return companies;
   }
 }
