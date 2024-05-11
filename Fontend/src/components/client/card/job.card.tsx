@@ -14,7 +14,7 @@ dayjs.extend(relativeTime)
 interface IQuery{
     name?:string,
     location?:string,
-    skills?:string                                      
+    skills?:string
 }
 interface IProps {
     showPagination?: boolean;
@@ -47,19 +47,20 @@ const JobCard = (props: IProps) => {
         if (sortQuery) {
             query += `&${sortQuery}`;
         }
-        if(searchQuery){
-            const {name, skills, location}: IQuery = searchQuery;
-            if(name){
-                query+=`&name=/${name}/i`;
+        if (searchQuery) {
+            const { name, skills, location }: IQuery = searchQuery;
+            console.log('skills',typeof skills);
+    
+            // Kiểm tra các trường name, skills và location trước khi thêm chúng vào query
+            if (name && name.trim() !== "") {
+                query += `&name=/${name}/i`;
             }
             if(skills){
-              
-                const skillsString = skills.split(",").join(",");
-                console.log('skills',skillsString);
-                query += `&skills=/${skillsString}/i`;
+                console.log('skills', skills);
+                query+=`&skills=/${skills}/i`
             }
-            if(location){
-                query+=`&location=/${location}/i`;
+            if (location && location.trim() !== "") {
+                query += `&location=/${location}/i`;
             }
         }
         console.log('query',query)

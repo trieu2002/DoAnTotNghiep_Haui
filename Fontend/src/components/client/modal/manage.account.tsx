@@ -1,18 +1,26 @@
-import { Button, Col, Form, Modal, Row, Select, Table, Tabs, message, notification } from "antd";
+import { Button, Col, Form, Modal, Row, Select, Table, Tabs, message, notification,Input} from "antd";
 import { isMobile } from "react-device-detect";
 import type { TabsProps } from 'antd';
 import { IResume } from "@/types/backend";
 import { useState, useEffect } from 'react';
-import { callFetchResumeByUser, callGetSubscriberSkills, callUpdateSubscriber } from "@/config/api";
+import { callFetchResumeByUser, callGetSubscriberSkills, callUpdateProfile, callUpdateSubscriber } from "@/config/api";
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { MonitorOutlined } from "@ant-design/icons";
 import { SKILLS_LIST } from "@/config/utils";
-import { useAppSelector } from "@/redux/hooks";
-
+import { useAppSelector ,useAppDispatch} from "@/redux/hooks";
+import { fetchAccount, setUserLoginInfo } from "@/redux/slice/accountSlide";
+const { Option } = Select;
 interface IProps {
     open: boolean;
     onClose: (v: boolean) => void;
+}
+interface IProfile{
+    name:string,
+    email:string,
+    age:number,
+    gender:string,
+    address:string
 }
 
 const UserResume = (props: any) => {
@@ -94,10 +102,105 @@ const UserResume = (props: any) => {
 }
 
 const UserUpdateInfo = (props: any) => {
+    const [form] = Form.useForm();
+    const dispatch=useAppDispatch();
+    const user = useAppSelector(state => state.account.user);
+    console.log('user1',user);
+  
+   const onFinish = async (values: any) => {
+    // call api thay đổi thông tin người dùng
+    const { name, email, age, gender, address }:IProfile = values;
+    
+        const res = await callUpdateProfile({ name,email,age,gender,address });
+        console.log('res',res);
+        if (res.data) {
+            message.success("Cập nhật thông tin thành công");
+            dispatch(setUserLoginInfo(values));
+            
+        } else {
+            notification.error({
+                message: 'Có lỗi xảy ra',
+                description: "Failed to update profile"
+            });
+        }
+    
+  }
+
     return (
-        <div>
-            //todo
-        </div>
+        <>
+             <Form
+                onFinish={onFinish}
+                form={form}
+                initialValues={{
+                    name: user.name,
+                    email: user.email,
+                    age: user.age,
+                    gender: user.gender,
+                    address: user.address
+                }}
+                
+            >
+                <Row gutter={[20, 20]}>
+                    <Col span={24}>
+                        <Form.Item
+                            label={"Tên"}
+                            name={"name"}
+                            rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+                        >
+                            <Input placeholder="Nhập tên mới" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={24}>
+                        <Form.Item
+                            label={"Email"}
+                            name={"email"}  
+                            rules={[{ required: true, message: 'Vui lòng nhập email!' }, { type: 'email', message: 'Email không hợp lệ!' }]}
+                        >
+                            <Input placeholder="Nhập Email mới" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={24}>
+                        <Form.Item
+                            label={"Tuổi"}
+                            name={"age"}
+                            rules={[{ required: true, message: 'Vui lòng nhập tuổi!' }]}
+                        >
+                            <Input placeholder="Nhập tuổi mới" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={24}>
+                        <Form.Item
+                            label={"Giới tính"}
+                            name={"gender"}
+                            rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
+                        >
+                            <Select
+                                    // placeholder="Select a option and change input text above"
+                                    // onChange={onGenderChange}
+                                    allowClear
+                                    defaultValue={user.gender}
+                                >
+                                    <Option value="male">Nam</Option>
+                                    <Option value="female">Nữ</Option>
+                                    <Option value="other">Khác</Option>
+                                </Select>
+                        </Form.Item>
+                    </Col>
+                    <Col span={24}>
+                        <Form.Item
+                            label={"Địa chỉ"}
+                            name={"address"}
+                            rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
+                        >
+                            <Input.TextArea />
+                        </Form.Item>
+                    </Col>
+                    <Col span={24}>
+                        <Button type="primary" htmlType="submit">Cập nhật</Button>
+                    </Col>
+                </Row>
+            </Form>
+        </>
     )
 }
 
@@ -194,11 +297,7 @@ const ManageAccount = (props: IProps) => {
             label: `Cập nhật thông tin`,
             children: <UserUpdateInfo />,
         },
-        {
-            key: 'user-password',
-            label: `Thay đổi mật khẩu`,
-            children: `//todo`,
-        },
+        
     ];
 
 

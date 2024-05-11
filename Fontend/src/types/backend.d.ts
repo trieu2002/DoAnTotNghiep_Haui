@@ -24,7 +24,10 @@ export interface IAccount {
         role: {
             _id: string;
             name: string;
-        }
+        },
+        address:string,
+        gender:string,
+        age:number,
         permissions: {
             _id: string;
             name: string;

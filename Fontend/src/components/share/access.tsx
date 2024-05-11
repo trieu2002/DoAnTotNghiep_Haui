@@ -14,6 +14,7 @@ const Access = (props: IProps) => {
     const [allow, setAllow] = useState<boolean>(true);
 
     const permissions = useAppSelector(state => state.account.user.permissions);
+    console.log('per',permission);
 
     useEffect(() => {
         if (permissions.length) {
@@ -22,6 +23,7 @@ const Access = (props: IProps) => {
                 && item.method === permission.method
                 && item.module === permission.module
             )
+            console.log('check',check);
             if (check) {
                 setAllow(true)
             } else

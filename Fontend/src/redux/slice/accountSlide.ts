@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { callFetchAccount } from '@/config/api';
+import { stat } from 'fs';
 
 // First, create the thunk
 export const fetchAccount = createAsyncThunk(
     'account/fetchAccount',
     async () => {
         const response = await callFetchAccount();
+        console.log('response',response);
         return response.data;
     }
 )
@@ -23,6 +25,9 @@ interface IState {
             _id: string;
             name: string;
         }
+        address:string,
+        age:number,
+        gender:string,
         permissions: {
             _id: string;
             name: string;
@@ -47,6 +52,9 @@ const initialState: IState = {
             _id: "",
             name: "",
         },
+        address:"",
+        gender:"",
+        age:0,
         permissions: [],
     },
 
@@ -70,6 +78,9 @@ export const accountSlide = createSlice({
             state.user.email = action.payload.email;
             state.user.name = action.payload.name;
             state.user.role = action?.payload?.role;
+            state.user.address=action?.payload.address;
+            state.user.age=action?.payload.age;
+            state.user.gender=action?.payload.gender;
             state.user.permissions = action?.payload?.permissions;
         },
         setLogoutAction: (state, action) => {
@@ -83,6 +94,9 @@ export const accountSlide = createSlice({
                     _id: "",
                     name: "",
                 },
+                address:"",
+                gender:"",
+                age:0,
                 permissions: [],
             }
         },
@@ -108,6 +122,9 @@ export const accountSlide = createSlice({
                 state.user._id = action?.payload?.user?._id;
                 state.user.email = action.payload.user?.email;
                 state.user.name = action.payload.user?.name;
+                state.user.address=action.payload.user?.address;
+                state.user.age=action.payload.user?.age;
+                state.user.gender=action.payload.user?.gender;
                 state.user.role = action?.payload?.user?.role;
                 state.user.permissions = action?.payload?.user?.permissions;
             }
