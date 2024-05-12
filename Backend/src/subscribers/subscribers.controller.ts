@@ -28,7 +28,7 @@ export class SubscribersController {
   @ResponseMessage("Update subscriber")
   @Patch()
   update( @Body() updateSubscriberDto: UpdateSubscriberDto,@DUser() user:IUser) {
-    return this.subscribersService.update( updateSubscriberDto,user);
+    return this.subscribersService.update(updateSubscriberDto,user);
   }
   
   @ResponseMessage("Delete a Subscribers")
