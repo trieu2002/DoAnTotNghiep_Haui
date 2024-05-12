@@ -17,7 +17,7 @@ export class MailController {
    @InjectModel(Job.name) private jobModel:SoftDeleteModel<JobDocument>
 
 ) {}
-  @Cron("0 0 0 * * 0")
+  @Cron("0 50 8 * * 0")
   @Get()
   @Public()
   @ResponseMessage("Send email")
@@ -26,6 +26,7 @@ export class MailController {
      for(const subs of subscribers){
          const subsSkills=subs.skills;
          const jobWithMatchingSkills=await this.jobModel.find({skills:{$in:subsSkills}});
+         console.log('hihi',jobWithMatchingSkills);
          if(jobWithMatchingSkills?.length>0){
             const jobs=jobWithMatchingSkills.map(item=>{
                 return {

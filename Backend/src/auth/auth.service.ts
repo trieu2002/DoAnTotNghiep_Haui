@@ -133,11 +133,14 @@ export class AuthService {
         return 'OK'; 
     }
     async googleAuthRedirect(req:Request,res:Response){
+      console.log(req.user);
       const user:IUser=req.user;
       if(user){
-         return res.redirect(`http://localhost:3000/login?id=${user?._id}`);
+        console.log('chạy vao req.user')
+         return await res.redirect(`http://localhost:3000/login?id=${user?._id}`);
       }else{
-        return res.redirect(`http://localhost:3000/login`);
+        console.log('chạy vao error req.user')
+        return await res.redirect(`http://localhost:3000/login`);
       }
     }
     async loginGoogle(id: string, req: Request, res: Response) {

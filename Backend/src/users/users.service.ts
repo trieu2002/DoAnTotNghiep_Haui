@@ -149,33 +149,35 @@ export class UsersService {
      return updated;
   }
   async upsertUserSocial(type,dataRaw){
-       console.log(dataRaw,'data');
        try {
-        let user=null;
+         let user=null;
          if(type==='GOOGLE'){
-          const userRole=await this.roleModel.findOne({name:USER_ROLE});
+            const userRole=await this.roleModel.findOne({name:USER_ROLE});
              user=await this.userModel.findOne({typeAcc:type,email:dataRaw.email});
              if(!user){
-                await this.userModel.create({
+                 const newUser=await this.userModel.create({
                   email:dataRaw.email,
                   name:dataRaw.username,
                   typeAcc:type,
                   role:userRole?._id
                 })
+                user=newUser;
              }
          };
          if(type==='FACEBOOK'){
           const userRole=await this.roleModel.findOne({name:USER_ROLE});
              user=await this.userModel.findOne({typeAcc:type,email:dataRaw.email});
              if(!user){
-                await this.userModel.create({
+                const newUser= await this.userModel.create({
                   email:dataRaw.email,
                   name:dataRaw.username,
                   typeAcc:type,
                   role:userRole?._id
                 })
+                user=newUser;
              }
          };
+         console.log('usser112',user);
          return user;
        } catch (error) {
          console.log(error);
