@@ -27,6 +27,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       accessToken
     }
     let user=await this.userService.upsertUserSocial(type,dataRaw);
+    console.log(user,'usrehihihi')
     return done(null, user);
   }
 }

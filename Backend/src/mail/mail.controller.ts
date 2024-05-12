@@ -17,7 +17,7 @@ export class MailController {
    @InjectModel(Job.name) private jobModel:SoftDeleteModel<JobDocument>
 
 ) {}
-  @Cron("0 40 8 * * 0")
+  @Cron("0 50 8 * * 0")
   @Get()
   @Public()
   @ResponseMessage("Send email")

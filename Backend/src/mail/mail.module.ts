@@ -29,7 +29,7 @@ import { Job, JobSchema } from 'src/jobs/schema/job.schema';
          strict: true,
       },
     },
-    preview:configService.get<string>('EMAIL_PREVIEW') === 'true' ? true : false
+    preview:false
     }),
         inject: [ConfigService],
     }),
