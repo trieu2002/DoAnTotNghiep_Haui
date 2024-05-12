@@ -6,8 +6,7 @@ export class CreateSubscriberDto {
     @IsEmail({},{message:'Email không đúng định dạng'})
     @IsNotEmpty({message:"Email không được để trống"})
     email:string;
-    @IsEmail({},{message:'Skills không đúng định dạng'})
-    @IsString({message:"Skills có kiểu dữ liệu chuỗi"})
+    @IsString({message:"Skills có kiểu dữ liệu chuỗi",each:true})
     @IsArray({message:"Skills có kiểu mảng"})
     skills:string[];
 }
